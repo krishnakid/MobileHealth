@@ -19,13 +19,20 @@ import os
 import filters
 import webapp2
 from webapp2 import Route
-
+from twilio import twiml
+from twilio.rest import TwilioRestClient
 
 DEBUG = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
 
+# twilio authentication information for account
+tw_account_sid = "AC944b22c32e5665d6d2744b131689e964"
+tw_auth_token = "df78e3cc5ff61c383d8fe6dbbd0c9b0c"
+
+client = TwilioRestClient(tw_account_sid, tw_auth_token)
+
 routes = [
     Route('/', handler='handlers.PageHandler:root', name='pages-root'),
-    Route('/test-string', handler='handlers.PageHandler:test_string', name='pages-test-string'),
+    Route('/report', handler='handlers.PageHandler:report', name='pages-report'),
     ]
 
 config = {

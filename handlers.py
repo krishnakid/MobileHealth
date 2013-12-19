@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
+# simple patch of scotch-base with the twilio api to respond to 
+# texts sent to trial account.  Will be extended to extract report
+# information from incoming texts.
+#
+# @author: Rahul Dhodapkar (krishnakid)
+# @version: 12.19.13
+
 import datetime
 import webapp2
 from webapp2_extras import jinja2
+import twilio.twiml
 
+callers = {
+    "+13475633757": "Rahul Dhodapkar"
+}
 
 class BaseHandler(webapp2.RequestHandler):
     """
@@ -24,6 +35,8 @@ class BaseHandler(webapp2.RequestHandler):
 
 
 class PageHandler(BaseHandler):
+    # root function to display CSV with content dump from the 
+    # Google Datastore.
     def root(self):
         now = datetime.datetime.now()
         ten_min_ago = now - datetime.timedelta(minutes=10)
@@ -33,8 +46,17 @@ class PageHandler(BaseHandler):
         }
         return self.render_template('pages_test_filters.html', context)
 
-    def test_string(self):
-        context = {
-            'now': datetime.datetime.now(),
-        }
-        return self.render_string('Now is {{ now|datetimeformat }}', context)
+    # function to handle incoming twilio texts.  Will load requisite
+    # data to the appropriate Google Datastore
+    def report(self):
+        number = self.request.get('From')
+        if number in callers:
+            message = "Hello, " + callers[number]
+        else:
+            message = "Hello, Monkey"
+        resp = twilio.twiml.Response()
+        resp.message(message)
+        context = {}
+        return self.render_string(str(resp), context)
+
+
